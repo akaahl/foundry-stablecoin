@@ -63,7 +63,7 @@ contract DSCEngine is ReentrancyGuard {
     error DSCEngine__MintFailed();
     error DSCEngine__BreaksHealthFactor(uint256 healthFactorValue);
 
-     ///////////////////
+    ///////////////////
     // Types         //
     ///////////////////
     // using OracleLib for AggregatorV3Interface;
@@ -89,7 +89,7 @@ contract DSCEngine is ReentrancyGuard {
     /// @dev Amount of DSC minted by user
     mapping(address user => uint256 amount) private s_DSCMinted;
 
-     /// @dev If we know exactly how many tokens we have, we could make this immutable!
+    /// @dev If we know exactly how many tokens we have, we could make this immutable!
     address[] private s_collateralTokens;
 
     ///////////////////
@@ -157,7 +157,7 @@ contract DSCEngine is ReentrancyGuard {
 
     function redeemCollateral() external { }
 
-     //////////////////////
+    //////////////////////
     // Public Functions  //
     //////////////////////
 
@@ -242,7 +242,7 @@ contract DSCEngine is ReentrancyGuard {
         return totalCollateralValueInUsd;
     }
 
-     function getUsdValue(
+    function getUsdValue(
         address token,
         uint256 amount // in WEI
     )
