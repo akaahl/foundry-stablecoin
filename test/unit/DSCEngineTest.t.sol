@@ -112,7 +112,7 @@ contract DSCEngineTest is StdCheats, Test {
         vm.stopPrank();
     }
 
-     modifier depositedCollateral() {
+    modifier depositedCollateral() {
         vm.startPrank(user);
         ERC20Mock(weth).approve(address(dsce), amountCollateral);
         dsce.depositCollateral(weth, amountCollateral);
