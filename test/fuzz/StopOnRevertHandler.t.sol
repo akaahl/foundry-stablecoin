@@ -4,14 +4,14 @@ pragma solidity ^0.8.19;
 
 import { EnumerableSet } from "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 import { Test } from "forge-std/Test.sol";
-// import { ERC20Mock } from "@openzeppelin/contracts/mocks/ERC20Mock.sol"; Updated mock location
+import { ERC20Mock } from "@openzeppelin/contracts/mocks/ERC20Mock.sol"; // Updated mock location
 // import { ERC20Mock } from "../../mocks/ERC20Mock.sol";
 
 import { MockV3Aggregator } from "../mocks/MockV3Aggregator.sol";
-import { DSCEngine, AggregatorV3Interface } from "../../../src/DSCEngine.sol";
-import { DecentralizedStableCoin } from "../../../src/DecentralizedStableCoin.sol";
+import { DSCEngine, AggregatorV3Interface } from "../../src/DSCEngine.sol";
+import { DecentralizedStableCoin } from "../../src/DecentralizedStableCoin.sol";
 import { console } from "forge-std/console.sol";
-import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+// import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 contract StopOnRevertHandler is Test {
     using EnumerableSet for EnumerableSet.AddressSet;
@@ -21,8 +21,8 @@ contract StopOnRevertHandler is Test {
     DecentralizedStableCoin public dsc;
     MockV3Aggregator public ethUsdPriceFeed;
     MockV3Aggregator public btcUsdPriceFeed;
-    IERC20 public weth;
-    IERC20 public wbtc;
+    ERC20Mock public weth;
+    ERC20Mock public wbtc;
 
     // Ghost Variables
     uint96 public constant MAX_DEPOSIT_SIZE = type(uint96).max;
@@ -32,8 +32,8 @@ contract StopOnRevertHandler is Test {
         dsc = _dsc;
 
         address[] memory collateralTokens = dscEngine.getCollateralTokens();
-        weth = IERC20(collateralTokens[0]);
-        wbtc = IERC20(collateralTokens[1]);
+        weth = ERC20Mock(collateralTokens[0]);
+        wbtc = ERC20Mock(collateralTokens[1]);
 
         ethUsdPriceFeed = MockV3Aggregator(dscEngine.getCollateralTokenPriceFeed(address(weth)));
         btcUsdPriceFeed = MockV3Aggregator(dscEngine.getCollateralTokenPriceFeed(address(wbtc)));
@@ -47,7 +47,7 @@ contract StopOnRevertHandler is Test {
     function mintAndDepositCollateral(uint256 collateralSeed, uint256 amountCollateral) public {
         // must be more than 0
         amountCollateral = bound(amountCollateral, 1, MAX_DEPOSIT_SIZE);
-        IERC20 collateral = _getCollateralFromSeed(collateralSeed);
+        ERC20Mock collateral = _getCollateralFromSeed(collateralSeed);
 
         vm.startPrank(msg.sender);
         collateral.mint(msg.sender, amountCollateral);
@@ -57,7 +57,7 @@ contract StopOnRevertHandler is Test {
     }
 
     function redeemCollateral(uint256 collateralSeed, uint256 amountCollateral) public {
-        IERC20 collateral = _getCollateralFromSeed(collateralSeed);
+        ERC20Mock collateral = _getCollateralFromSeed(collateralSeed);
         uint256 maxCollateral = dscEngine.getCollateralBalanceOfUser(msg.sender, address(collateral));
 
         amountCollateral = bound(amountCollateral, 0, maxCollateral);
@@ -95,7 +95,7 @@ contract StopOnRevertHandler is Test {
             return;
         }
         debtToCover = bound(debtToCover, 1, uint256(type(uint96).max));
-        IERC20 collateral = _getCollateralFromSeed(collateralSeed);
+        ERC20Mock collateral = _getCollateralFromSeed(collateralSeed);
         dscEngine.liquidate(address(collateral), userToBeLiquidated, debtToCover);
     }
 
@@ -116,14 +116,14 @@ contract StopOnRevertHandler is Test {
     /////////////////////////////
     function updateCollateralPrice(uint96 newPrice, uint256 collateralSeed) public {
         int256 intNewPrice = int256(uint256(newPrice));
-        IERC20 collateral = _getCollateralFromSeed(collateralSeed);
+        ERC20Mock collateral = _getCollateralFromSeed(collateralSeed);
         MockV3Aggregator priceFeed = MockV3Aggregator(dscEngine.getCollateralTokenPriceFeed(address(collateral)));
 
         priceFeed.updateAnswer(intNewPrice);
     }
 
     /// Helper Functions
-    function _getCollateralFromSeed(uint256 collateralSeed) private view returns (IERC20) {
+    function _getCollateralFromSeed(uint256 collateralSeed) private view returns (ERC20Mock) {
         if (collateralSeed % 2 == 0) {
             return weth;
         } else {

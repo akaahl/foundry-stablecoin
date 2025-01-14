@@ -9,7 +9,8 @@ import { DeployDSC } from "../../script/DeployDSC.s.sol";
 import { DSCEngine } from "../../src/DSCEngine.sol";
 import { DecentralizedStableCoin } from "../../src/DecentralizedStableCoin.sol";
 import { HelperConfig } from "../../script/HelperConfig.s.sol";
-import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+// import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import { ERC20Mock } from "@openzeppelin/contracts/mocks/ERC20Mock.sol";
 import { StopOnRevertHandler } from "./StopOnRevertHandler.t.sol";
 
 contract OpenInvariantsTest is StdInvariant, Test {
@@ -36,8 +37,8 @@ contract OpenInvariantsTest is StdInvariant, Test {
 
     function invariant_protocolMustHaveMoreValueThatTotalSupplyDollars() public view {
         uint256 totalSupply = dsc.totalSupply();
-        uint256 wethDeposited = IERC20(weth).balanceOf(address(dsce));
-        uint256 wbtcDeposited = IERC20(wbtc).balanceOf(address(dsce));
+        uint256 wethDeposited = ERC20Mock(weth).balanceOf(address(dsce));
+        uint256 wbtcDeposited = ERC20Mock(wbtc).balanceOf(address(dsce));
 
         uint256 wethValue = dsce.getUsdValue(weth, wethDeposited);
         uint256 wbtcValue = dsce.getUsdValue(wbtc, wbtcDeposited);
