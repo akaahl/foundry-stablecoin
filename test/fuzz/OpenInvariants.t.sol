@@ -30,7 +30,7 @@ contract OpenInvariantsTest is StdInvariant, Test {
         DeployDSC deployer = new DeployDSC();
         (dsc, dsce, helperConfig) = deployer.run();
         (ethUsdPriceFeed, btcUsdPriceFeed, weth, wbtc,) = helperConfig.activeNetworkConfig();
-        // handler = new StopOnRevertHandler(dsce, dsc);
+        handler = new StopOnRevertHandler(dsce, dsc);
         targetContract(address(handler));
         // targetContract(address(ethUsdPriceFeed)); Why can't we just do this?
     }
